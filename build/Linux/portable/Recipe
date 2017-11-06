@@ -74,7 +74,7 @@ rm -r qml
 rm -r lib
 
 # create binary zip file
-qt-deploy ../build/deployment-scripts/linux_x64.ini --deploy
+qt-deploy ../build/deployment-scripts/linux_$1.ini --deploy
 
 # prepare AppDir
 cd MachinekitClient.AppDir

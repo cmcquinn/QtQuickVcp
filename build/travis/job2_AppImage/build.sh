@@ -34,20 +34,21 @@ echo "#define REVISION \"${version}\"" > ./src/application/revision.h
 # Build AppImage depending on arch specified in $1 if cross-compiling, else default build x86_64
 case "$1" in
 
-  # --armhf )
-  #   shift
-  #   # build QtQuickVcp inside debian x86-64 multiarch image containing arm cross toolchain and libraries
-  #   docker run -i -v "${PWD}:/QtQuickVcp" \
-  #     ericfont/musescore:jessie-crosscompile-armhf \
-  #     /bin/bash -c \
-  #     "/QtQuickVcp/build/Linux+BSD/portable/RecipeDebian --build-only armhf $makefile_overrides"
-  #   # then run inside fully emulated arm image for AppImage packing step (which has trouble inside multiarch image)
-  #   docker run -i --privileged multiarch/qemu-user-static:register
-  #   docker run -i -v "${PWD}:/QtQuickVcp" --privileged \
-  #     ericfont/musescore:jessie-packaging-armhf \
-  #     /bin/bash -c \
-  #     "/QtQuickVcp/build/Linux+BSD/portable/RecipeDebian --package-only armhf"
-  #   ;;
+  --armhf )
+    shift
+    # build QtQuickVcp inside debian x86-64 multiarch image containing arm cross toolchain and libraries
+    docker run -i -v "${PWD}:/QtQuickVcp" \
+      ericfont/musescore:jessie-crosscompile-armhf \
+      /bin/bash -c \
+      "/QtQuickVcp/build/Linux+BSD/portable/RecipeDebian --build-only armhf $makefile_overrides"
+    # then run inside fully emulated arm image for AppImage packing step (which has trouble inside multiarch image)
+    docker run -i --privileged multiarch/qemu-user-static:register
+    docker run -i -v "${PWD}:/QtQuickVcp" --privileged \
+      ericfont/musescore:jessie-packaging-armhf \
+      /bin/bash -c \
+      "/QtQuickVcp/build/Linux/portable/Recipe armhf"
+    platform="armhf"
+    ;;
 
   # --i686 )
   #   shift
@@ -61,7 +62,7 @@ case "$1" in
     [ "$1" == "--x86_64" ] && shift || true
     # Build QtQuickVcp AppImage inside native (64-bit x86) Docker image
     docker run -i -v "${PWD}:/QtQuickVcp" machinekoder/qtquickvcp-docker-linux-x64:latest \
-           /bin/bash -c "/QtQuickVcp/build/Linux/portable/Recipe"
+           /bin/bash -c "/QtQuickVcp/build/Linux/portable/Recipe x64"
     platform="x64"
     ;;
 esac
