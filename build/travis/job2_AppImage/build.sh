@@ -37,16 +37,8 @@ case "$1" in
   --armhf )
     shift
     # build QtQuickVcp inside debian x86-64 multiarch image containing arm cross toolchain and libraries
-    docker run -i -v "${PWD}:/QtQuickVcp" \
-      ericfont/musescore:jessie-crosscompile-armhf \
-      /bin/bash -c \
-      "/QtQuickVcp/build/Linux+BSD/portable/RecipeDebian --build-only armhf $makefile_overrides"
-    # then run inside fully emulated arm image for AppImage packing step (which has trouble inside multiarch image)
-    docker run -i --privileged multiarch/qemu-user-static:register
-    docker run -i -v "${PWD}:/QtQuickVcp" --privileged \
-      ericfont/musescore:jessie-packaging-armhf \
-      /bin/bash -c \
-      "/QtQuickVcp/build/Linux/portable/Recipe armhf"
+    docker run -i -v "${PWD}:/QtQuickVcp" cmcquinn/qtquickvcp-docker-linux-armhf:latest \
+           /bin/bash -c "/QtQuickVcp/build/Linux/portable/Recipe armhf"
     platform="armhf"
     ;;
 

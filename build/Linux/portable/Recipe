@@ -37,13 +37,13 @@ fi
 ##########################################################################
 # BUILD QTQUICKVCP
 ##########################################################################
-export PATH="${PWD}/qt5/bin:$PATH"
-export LD_LIBRARY_PATH="${PWD}/qt5/lib:$LD_LIBRARY_PATH"
-export QT_PLUGIN_PATH="${PWD}/qt5/plugins"
-export QML_IMPORT_PATH="${PWD}/qt5/qml"
-export QML2_IMPORT_PATH="${PWD}/qt5/qml"
-export QT_QPA_PLATFORM_PLUGIN_PATH="${PWD}/qt5/plugins/platforms"
-export QT_INSTALL_PREFIX="${PWD}/qt5"
+#export PATH="${PWD}/qt5/bin:$PATH"
+#export LD_LIBRARY_PATH="${PWD}/qt5/lib:$LD_LIBRARY_PATH"
+#export QT_PLUGIN_PATH="${PWD}/qt5/plugins"
+#export QML_IMPORT_PATH="${PWD}/qt5/qml"
+#export QML2_IMPORT_PATH="${PWD}/qt5/qml"
+#export QT_QPA_PLATFORM_PLUGIN_PATH="${PWD}/qt5/plugins/platforms"
+#export QT_INSTALL_PREFIX="${PWD}/qt5"
 
 # If not building on Travis then might need to fetch QtQuickVcp
 [ -d "QtQuickVcp" ] || git clone --depth 1 https://github.com/qtquickvcp/QtQuickVcp.git
