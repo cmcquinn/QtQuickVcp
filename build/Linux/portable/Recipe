@@ -31,19 +31,23 @@ fi
 ##########################################################################
 # only prepare system if not already prepared (custom docker image)
 if [ ! -f /etc/system-prepared ]; then
-./init.sh
+  ./init.sh
 fi
 
 ##########################################################################
 # BUILD QTQUICKVCP
 ##########################################################################
-#export PATH="${PWD}/qt5/bin:$PATH"
-#export LD_LIBRARY_PATH="${PWD}/qt5/lib:$LD_LIBRARY_PATH"
-#export QT_PLUGIN_PATH="${PWD}/qt5/plugins"
-#export QML_IMPORT_PATH="${PWD}/qt5/qml"
-#export QML2_IMPORT_PATH="${PWD}/qt5/qml"
-#export QT_QPA_PLATFORM_PLUGIN_PATH="${PWD}/qt5/plugins/platforms"
-#export QT_INSTALL_PREFIX="${PWD}/qt5"
+
+# armhf uses qt5 from the Debian repos so these are wrong for armhf
+if [ $1 != "armhf"]
+  export PATH="${PWD}/qt5/bin:$PATH"
+  export LD_LIBRARY_PATH="${PWD}/qt5/lib:$LD_LIBRARY_PATH"
+  export QT_PLUGIN_PATH="${PWD}/qt5/plugins"
+  export QML_IMPORT_PATH="${PWD}/qt5/qml"
+  export QML2_IMPORT_PATH="${PWD}/qt5/qml"
+  export QT_QPA_PLATFORM_PLUGIN_PATH="${PWD}/qt5/plugins/platforms"
+  export QT_INSTALL_PREFIX="${PWD}/qt5"
+fi
 
 # If not building on Travis then might need to fetch QtQuickVcp
 [ -d "QtQuickVcp" ] || git clone --depth 1 https://github.com/qtquickvcp/QtQuickVcp.git
@@ -76,34 +80,37 @@ rm -r lib
 # create binary zip file
 qt-deploy ../build/deployment-scripts/linux_$1.ini --deploy
 
-# prepare AppDir
-cd MachinekitClient.AppDir
-cp /usr/share/pixmaps/machinekit.png .
-cp /usr/share/applications/machinekit-client.desktop .
-mv machinekit-client AppRun
-cd ..
+# AppImageKit is not currently working on armhf, so don't bother with the AppImage stuff if build for armhf
+if [ $1 != "armhf"]
 
-# prepare variables
-appdir=${PWD}/MachinekitClient.AppDir/
-appimage=${PWD}/MachinekitClient.AppImage
+  # prepare AppDir
+  cd MachinekitClient.AppDir
+  cp /usr/share/pixmaps/machinekit.png .
+  cp /usr/share/applications/machinekit-client.desktop .
+  mv machinekit-client AppRun
+  cd ..
 
-# back to home folder
-cd ../../
+  # prepare variables
+  appdir=${PWD}/MachinekitClient.AppDir/
+  appimage=${PWD}/MachinekitClient.AppImage
 
-##########################################################################
-# PACKAGE INTO APPIMAGE WITH APPIMAGEKIT
-##########################################################################
+  # back to home folder
+  cd ../../
 
-cd AppImageKit/AppImageAssistant.AppDir
-./package  "$appdir" "$appimage"
+  ##########################################################################
+  # PACKAGE INTO APPIMAGE WITH APPIMAGEKIT
+  ##########################################################################
+  cd AppImageKit/AppImageAssistant.AppDir
+  ./package  "$appdir" "$appimage"
 
-# allow access to AppImage from outside the chroot
-chmod a+rwx "$appimage"
-parent_dir="$(dirname "$appimage")"
-while [ "$(dirname "$parent_dir")" != "$parent_dir" ]; do
-  [ "$parent_dir" == "/" ] && break
-  chmod a+rwx "$parent_dir"
-  parent_dir="$(dirname "$parent_dir")"
-done
+  # allow access to AppImage from outside the chroot
+  chmod a+rwx "$appimage"
+  parent_dir="$(dirname "$appimage")"
+  while [ "$(dirname "$parent_dir")" != "$parent_dir" ]; do
+    [ "$parent_dir" == "/" ] && break
+    chmod a+rwx "$parent_dir"
+    parent_dir="$(dirname "$parent_dir")"
+  done
 
-ls -lh "$appimage"
+  ls -lh "$appimage"
+fi
