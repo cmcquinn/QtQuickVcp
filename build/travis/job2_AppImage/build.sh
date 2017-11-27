@@ -89,13 +89,15 @@ if [ "${upload}" ]; then
     mv build.release/QtQuickVcp.tar.gz ${target}-${version}-Linux-${platform}.tar.gz
     ./build/travis/job2_AppImage/bintray_lib.sh ${target}-${version}*.tar.gz
 
-    if [ $release -eq 1 ]; then
-        target="MachinekitClient"
-    else
-        target="MachinekitClient_Development"
+    if [ "$1" != "--armhf"]
+        if [ $release -eq 1 ]; then
+            target="MachinekitClient"
+        else
+            target="MachinekitClient_Development"
+        fi
+        mv build.release/MachinekitClient.AppImage ${target}-${version}-${platform}.AppImage
+        ./build/travis/job2_AppImage/bintray_app.sh ${target}*.AppImage
     fi
-    mv build.release/MachinekitClient.AppImage ${target}-${version}-${platform}.AppImage
-    ./build/travis/job2_AppImage/bintray_app.sh ${target}*.AppImage
 else
   echo "On branch '$branch' so AppImage will not be uploaded." >&2
 fi

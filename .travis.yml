@@ -52,35 +52,35 @@ matrix:
     #     - 'ARTIFACTS_PATHS="$(ls vtest/html | tr "\n" ":")" artifacts upload'
 
     # 2nd parallel build job - portable Linux AppImage 64-bit x86 build on CentOS
-    - env: "JOB=AppImage_x64"
-      addons:
-        apt:
-          packages:
-          - bsdtar
-          - curl
-          # - zsync
-      services:
-        - docker
-      script:
-        - "if [[ $APPIMAGE_BUILD_ARCHS == *x86_64* ]]; then ./build/travis/job2_AppImage/build.sh --x86_64 --upload-branches $APPIMAGE_UPLOAD_BRANCHES; fi"
+    #- env: "JOB=AppImage_x64"
+    #  addons:
+    #    apt:
+    #      packages:
+    #      - bsdtar
+    #      - curl
+    #      # - zsync
+    #  services:
+    #    - docker
+    #  script:
+    #    - "if [[ $APPIMAGE_BUILD_ARCHS == *x86_64* ]]; then ./build/travis/job2_AppImage/build.sh --x86_64 --upload-branches $APPIMAGE_UPLOAD_BRANCHES; fi"
 
-    - env: "JOB=Android_armv7"
-      addons:
-        apt:
-          packages:
-            - bsdtar
-            - curl
-            # - zsync
-      services:
-        - docker
-      before_install:
-        - echo "$ANDROID_STOREPASS" > ./build/Linux/android/storepass
-        - echo "$ANDROID_KEYPASS" > ./build/Linux/android/keypass
-        - openssl aes-256-cbc -K $encrypted_3915c3e19012_key -iv $encrypted_3915c3e19012_iv -in ./build/Linux/android/secrets.tar.enc -out ./build/Linux/android/secrets.tar -d
-        - tar xvf ./build/Linux/android/secrets.tar -C ./build/Linux/android/
+    #- env: "JOB=Android_armv7"
+    #  addons:
+    #    apt:
+    #      packages:
+    #        - bsdtar
+    #        - curl
+    #        # - zsync
+    #  services:
+    #    - docker
+    #  before_install:
+    #    - echo "$ANDROID_STOREPASS" > ./build/Linux/android/storepass
+    #    - echo "$ANDROID_KEYPASS" > ./build/Linux/android/keypass
+    #    - openssl aes-256-cbc -K $encrypted_3915c3e19012_key -iv $encrypted_3915c3e19012_iv -in ./build/Linux/android/secrets.tar.enc -out ./build/Linux/android/secrets.tar -d
+    #    - tar xvf ./build/Linux/android/secrets.tar -C ./build/Linux/android/
+    #  script:
+    #      - "./build/travis/job3_Android/build.sh --upload-branches $ANDROID_UPLOAD_BRANCHES"
 
-      script:
-          - "./build/travis/job3_Android/build.sh --upload-branches $ANDROID_UPLOAD_BRANCHES"
     # 3rd parallel build job - portable Linux AppImage 32-bit x86 build on CentOS
     #- env: "JOB=AppImage_i686"
     #  addons:
@@ -110,22 +110,26 @@ matrix:
         - "if [[ $APPIMAGE_BUILD_ARCHS == *armhf* ]]; then ./build/travis/job2_AppImage/build.sh --armhf --upload-branches $APPIMAGE_UPLOAD_BRANCHES; fi"
 
     # 5th parallel build job - mac osx build
-    - env: "JOB=MacOSX"
-      os: osx
-      osx_image: xcode7.3
-      #cache:
-      #  directories:
-      #    - /usr/local/Cellar
-      before_install:
-        - source build/travis/job_macos/before_install.sh
-      install:
-        - "./build/travis/job_macos/install.sh"
-      script:
-        - "./build/travis/job_macos/build.sh --upload-branches $MACOSX_UPLOAD_BRANCHES"
+    #- env: "JOB=MacOSX"
+    #  os: osx
+    #  osx_image: xcode7.3
+    #  #cache:
+    #  #  directories:
+    #  #    - /usr/local/Cellar
+    #  before_install:
+    #    - source build/travis/job_macos/before_install.sh
+    #  install:
+    #    - "./build/travis/job_macos/install.sh"
+    #  script:
+    #    - "./build/travis/job_macos/build.sh --upload-branches $MACOSX_UPLOAD_BRANCHES"
 
 notifications:
   email:
     recipients:
-      secure: "fZIMy64OEMyZC/pwIQT9ZF/9PIfNnBVjrkssLZy8REG7zKuikpk1mMDPsvhnPcadopOR09AyiUcKUSNAc+A8TOCPDg0hK4dzJvoMpCCceU0THgJqgauxONMX9BNi6sfkqrARnt3ahar2AoxjBWvqq2PUVl/rUjN3Y0YZcxmMRyApeu9SY16KL3B9i79UsQ5pQBpDQ8UDfSaRLfvUJcf2Lw8/IWIcW2r5kC86aVF38GAz5fMFLEd+4/6MLtWDDni+gbh3yMqEd1Qbwsv9y/Dwt/NHs2ucUVk3QCX2vLJEKnBDatJkP2ESdRdKit+IyAOoB9MCsjKht+Kl3Axe7cTuVLYRg4lqV6vPEqRkpjQEuMvfFEjnP3vWcY1Iwdzwr1ywziP/Bc70ql891q7b1Koh8exUyM0bSHrKRTTaoihcMhfEcTPx/NHxue7C0CGOetKq87ukWx1CnYkBIkUc67lvsPyiMVCTDi9RynslEEy51jTeMcmX/th+SA+PAtEjBtZNUqXOZ3pcz0OypwW5b/TkXegEs6Gp5qxyqJU4oU3fRqitWGIf+z3kxX114Zh1xGnAYDy9nf9UcM0PiFglJCQsTMZV1ckGPOQz+MjqPc1n6NQL0UypwEac2g/N5wtPl7yZe34j4hlQhgC7W6bJanZWPqk4ZFhSzPVoo4i4bQHIdsg="
-    on_success: change
+      - secure: >-
+          V+Mvo028GSQLDo5M33TEcqMUG+sC5AWO5YNRhzPpFM2/MU+YPffu6f/nYg54cnJ1NAPo5g15aCgzwSd0ETUcM/ETx8o1Ybs4DbLawlIdEbavY7kvwr/Aa2f87qXR2yIIxdtp/l32XkCHjX+qiNRgCrnm4JdkcV8wQR87tyK2Gzt085H8cCLiiLWmmjO/B1c+rPhwoqXl1NLWPFa+smpVSwDw5hgIEBNhN3d3mzm9ZN+qI54U7DWIeL1mkC9SVHFA2sQQyRa8oRypsN9/3RNyTGChbVVkhLQnszCFmidZfZgNJxkJXn+e+vfdDKVJ5JCfjVANp4/FmtKWQ7150bcqjo8Dv5bN4iTbJzfVmzvBKtd2b/cVdNDR+0QlpbcR6+kvhW91tyBVAR4gI0aUEPnJfxr56+4W9uTHrUn3dHlCgmCxOri9kZhqZsrRHHJsOq3g2PtwZxj3my+g4/giBJv0xIcgD9ij45VQyC4SD8b4AjWb+WGBV4wPwS827SdYQxTjZB8d4O908TW5+QTcowGPGuJbgnt4intGxGwKeVC37sHLzl3fg33KZVAprJgocZMPgqkLnwDKdP00INCUokrw2s9M5Vc93AJ7afNNPjwzbS+YFgNuGrRUMh2HF8I46vfsEa7vbOB31yPDN5hzpxlX2el4A36yHw4MtjMtk8DkoP0=
+    on_success: always
     on_failure: always
+  slack:
+    secure: >-
+      owPdeRkXvFLyxxn3+050xV77eH71kLWHsnO9jNpg1ZDVrSTk5QGCzaZoetVFc8fIA2PnEy2AO2ZFJTgYfoo3VMa80djQe0P19+nn9gMNshEfQYI9WjSPp7sWCpt2DFhtk5KH9nvNpAbcwZqV2Z55cIAnJ3J0YGmHEDGUogeGWQI86Q50xO6WjnabjcrvZ7xsclt0F943qgXYwvw5QI4gvGR4MCOehG1CBHFtBdaCTUSJ+O1lxaaZ0n8x3eRNANv3rDy+nuIaC0zHwDAbZiUVjsQi5ZfY54GmZvNJJV2CvUN+ejrooOZj2CXI5qZ1TPx4CK0nO2Kp30hg7GzXW+FIHdUuLWbIwwEBH3S4xVqpL8FOlUhi5UNRD+hRk2vfPoalMfL7YPIcG6v6fdeOa4WC1O9fccCch9gfNoE0AnwQXm4ysiHrghOaeTiSfDt86BQSgAZczO8TRda/YhwAwGxFWdA9PM7tYclROBix6YPU2dp3Bx8KOT4QK+F/hduAqBuE8b9mZTOMZlIZVcBglbjHls/UzGenEglEi0VT/5CaA8cixUirAOACB9hR8qNCh4mv/c9HMhAzv8gf+oXTg8981OhzqjfdE+iH7SHy/VHlwEhNH+pPXmGp6YVgkrFu0OR2aV8wjMvHaOyZWXsIRAKCKo760kY8eu+P0RFyJ4ZAoiM=
