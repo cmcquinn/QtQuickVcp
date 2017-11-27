@@ -39,7 +39,7 @@ fi
 ##########################################################################
 
 # armhf uses qt5 from the Debian repos so these are wrong for armhf
-if [ $1 != "armhf"]
+if [ $1 != "armhf" ]
   export PATH="${PWD}/qt5/bin:$PATH"
   export LD_LIBRARY_PATH="${PWD}/qt5/lib:$LD_LIBRARY_PATH"
   export QT_PLUGIN_PATH="${PWD}/qt5/plugins"
