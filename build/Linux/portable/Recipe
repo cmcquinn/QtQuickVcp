@@ -58,8 +58,10 @@ cd QtQuickVcp
 mkdir -p build.release
 cd build.release
 
+# Figure out how many processor cores there are
+export CORES=$(grep -c ^processor /proc/cpuinfo)
 qmake -r ..
-make
+make -j${CORES}
 # make docs
 make install
 # make install_docs

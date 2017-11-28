@@ -38,8 +38,6 @@ case "$1" in
     shift
     # build QtQuickVcp inside debian x86-64 multiarch image containing arm cross toolchain and libraries
     docker run -i -v "${PWD}:/QtQuickVcp" cmcquinn/qtquickvcp-docker-linux-armhf:latest \
-            -e CORES=$(grep -c ^processor /proc/cpuinfo) \
-            -e MAKEFLAGS='-j${CORES}' \
            /bin/bash -c "/QtQuickVcp/build/Linux/portable/Recipe armhf"
     platform="armhf"
     ;;
