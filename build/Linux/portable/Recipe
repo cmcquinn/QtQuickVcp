@@ -57,7 +57,9 @@ cd QtQuickVcp
 
 # deployment.pri needs to be patched on armhf or make install fails
 if [ "$1" == "armhf" ]; then
+  cd src
   patch < deployment-armhf.patch
+  cd ..
 fi
 
 mkdir -p build.release
