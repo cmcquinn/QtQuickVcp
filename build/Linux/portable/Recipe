@@ -56,7 +56,7 @@ fi
 cd QtQuickVcp
 
 # deployment.pri needs to be patched on armhf or make install fails
-if [ "$1" == "armhf"]; then
+if [ "$1" == "armhf" ]; then
   patch < deployment-armhf.patch
 fi
 
