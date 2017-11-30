@@ -80,7 +80,7 @@ mkdir qml
 mkdir lib
 cp -r ${QML_IMPORT_PATH}/Machinekit qml/Machinekit
 if [ "$1" == "armhf" ]; then
-  cp /usr/lib/arm-linux-gnueabihf/libmachinetalk*
+  cp /usr/lib/arm-linux-gnueabihf/libmachinetalk* lib/
 else
   cp ${QT_INSTALL_PREFIX}/lib/libmachinetalk* lib/
 fi
