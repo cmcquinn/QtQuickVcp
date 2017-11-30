@@ -92,8 +92,11 @@ ls -lh $zipfile
 rm -r qml
 rm -r lib
 
-# create binary zip file
-qt-deploy ../build/deployment-scripts/linux_$1.ini --deploy
+# qt-deploy is not working on armhf right now
+if [ "$1" == "armhf" ]; then
+  # create binary zip file
+  qt-deploy ../build/deployment-scripts/linux_$1.ini --deploy
+fi
 
 # AppImageKit is not currently working on armhf, so don't bother with the AppImage stuff if build for armhf
 if [ "$1" != "armhf"]; then

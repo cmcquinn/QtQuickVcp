@@ -89,6 +89,7 @@ if [ "${upload}" ]; then
     mv build.release/QtQuickVcp.tar.gz ${target}-${version}-Linux-${platform}.tar.gz
     ./build/travis/job2_AppImage/bintray_lib.sh ${target}-${version}*.tar.gz
 
+    # AppImage is not currently being build on armhf
     if [ "$1" != "--armhf" ]
         if [ $release -eq 1 ]; then
             target="MachinekitClient"
