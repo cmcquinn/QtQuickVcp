@@ -93,7 +93,7 @@ rm -r qml
 rm -r lib
 
 # qt-deploy is not working on armhf right now
-if [ "$1" == "armhf" ]; then
+if [ "$1" != "armhf" ]; then
   # create binary zip file
   qt-deploy ../build/deployment-scripts/linux_$1.ini --deploy
 fi
