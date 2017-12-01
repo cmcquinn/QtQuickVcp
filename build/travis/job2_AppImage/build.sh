@@ -90,7 +90,7 @@ if [ "${upload}" ]; then
     ./build/travis/job2_AppImage/bintray_lib.sh ${target}-${version}*.tar.gz
 
     # AppImage is not currently being build on armhf
-    if [ "$1" != "--armhf" ]; then
+    if [ "$platform" != "armhf" ]; then
         if [ $release -eq 1 ]; then
             target="MachinekitClient"
         else
