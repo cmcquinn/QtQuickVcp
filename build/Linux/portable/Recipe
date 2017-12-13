@@ -23,7 +23,7 @@ set -x # Be verbose
 if [ "$(grep "Debian GNU/Linux 9 (stretch)" /etc/*release*)" ]; then
   OS="Debian Stretch"
 else
-  echo "${0}: Warning: Not running on Debian Jessie!" >&2
+  echo "${0}: Warning: Not running on Debian Stretch!" >&2
 fi
 
 ##########################################################################
@@ -69,9 +69,9 @@ cd build.release
 # Figure out how many processor cores there are
 export CORES=$(grep -c ^processor /proc/cpuinfo)
 qmake -r ..
-make -j${CORES}
+make -j$((`nproc` + 1))
 # make docs
-make install
+sudo make install
 # make install_docs
 
 # compress QtQuick module
@@ -113,12 +113,16 @@ if [ "$1" != "armhf" ]; then
   appimage=${PWD}/MachinekitClient.AppImage
 
   # back to home folder
-  cd ../../
+  cd ../
+
+  # cleanup plugins.qmltypes files here, since they have been created with sudo
+  sudo chown -R `whoami` ./build.release
 
   ##########################################################################
   # PACKAGE INTO APPIMAGE WITH APPIMAGEKIT
   ##########################################################################
-  cd AppImageKit/AppImageAssistant.AppDir
+
+cd /AppImageKit/AppImageAssistant.AppDir
   ./package  "$appdir" "$appimage"
 
   # allow access to AppImage from outside the chroot

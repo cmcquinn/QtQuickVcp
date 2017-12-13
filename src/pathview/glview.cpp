@@ -497,7 +497,7 @@ void GLView::setupCube()
 void GLView::setupShaders()
 {
     // model shader
-    m_modelProgram = new QOpenGLShaderProgram();
+    m_modelProgram = new QOpenGLShaderProgram(this);
     m_modelProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/ModelVertexShader.glsl");
     m_modelProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/ModelFragmentShader.glsl");
     m_modelProgram->link();
@@ -517,7 +517,7 @@ void GLView::setupShaders()
     m_selectionModeLocation = m_modelProgram->uniformLocation("selectionMode");
 
     // line shader
-    m_lineProgram = new QOpenGLShaderProgram();
+    m_lineProgram = new QOpenGLShaderProgram(this);
     m_lineProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/LineVertexShader.glsl");
     m_lineProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/LineFragmentShader.glsl");
     m_lineProgram->link();
@@ -533,7 +533,7 @@ void GLView::setupShaders()
     m_lineSelectionModeLocation = m_lineProgram->uniformLocation("selectionMode");
 
     // text shader
-    m_textProgram = new QOpenGLShaderProgram();
+    m_textProgram = new QOpenGLShaderProgram(this);
     m_textProgram->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/TextVertexShader.glsl");
     m_textProgram->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/TextFragmentShader.glsl");
     m_textProgram->link();
@@ -756,7 +756,7 @@ void GLView::setupStack()
 void GLView::drawModelVertices(ModelType type)
 {
     QOpenGLBuffer *vertexBuffer = m_vertexBufferMap[type];
-    QList<Parameters*> *modelParametersList = getDrawableList(type);
+    const QList<Parameters*> *modelParametersList = getDrawableList(type);
 
     if (modelParametersList->isEmpty())
     {
@@ -769,9 +769,8 @@ void GLView::drawModelVertices(ModelType type)
     m_modelProgram->setAttributeBuffer(m_positionLocation, GL_FLOAT, 0, 3, sizeof(ModelVertex));
     m_modelProgram->setAttributeBuffer(m_normalLocation, GL_FLOAT, 3*sizeof(GLfloat), 3, sizeof(ModelVertex));
 
-    for (int i = 0; i < modelParametersList->size(); ++i)
+    for (Parameters *modelParameters: *modelParametersList)
     {
-        Parameters *modelParameters = static_cast<Parameters*>(modelParametersList->at(i));
         m_modelProgram->setUniformValue(m_colorLocation, modelParameters->color);
         m_modelProgram->setUniformValue(m_modelMatrixLocation, modelParameters->modelMatrix);
 
@@ -792,7 +791,7 @@ void GLView::drawModelVertices(ModelType type)
 
 void GLView::drawLines()
 {
-    QList<Parameters*>* parametersList = getDrawableList(Line);
+    const QList<Parameters*>* parametersList = getDrawableList(Line);
 
     if (parametersList->isEmpty())
     {
@@ -803,9 +802,9 @@ void GLView::drawLines()
     m_lineProgram->enableAttributeArray(m_linePositionLocation);
     m_lineProgram->setAttributeBuffer(m_linePositionLocation, GL_FLOAT, 0, 3);
 
-    for (int i = 0; i < parametersList->size(); ++i)
+    for (Parameters *parameters: *parametersList)
     {
-        LineParameters *lineParameters = static_cast<LineParameters*>(parametersList->at(i));
+        LineParameters *lineParameters = static_cast<LineParameters*>(parameters);
         m_lineVertexBuffer->write(0, lineParameters->vertices.data(), lineParameters->vertices.size() * static_cast<int>(sizeof(GLvector3D)));
         m_lineProgram->setUniformValue(m_lineColorLocation, lineParameters->color);
         m_lineProgram->setUniformValue(m_lineModelMatrixLocation, lineParameters->modelMatrix);
@@ -842,9 +841,9 @@ void GLView::drawTexts()
     m_textProgram->setAttributeBuffer(m_textPositionLocation, GL_FLOAT, 0, 3, sizeof(TextVertex));
     m_textProgram->setAttributeBuffer(m_textTexCoordinateLocation, GL_FLOAT, 3*sizeof(GLfloat), 2, sizeof(TextVertex));
 
-    for (int i = 0; i < parametersList->size(); ++i)
+    for (Parameters *parameters: *parametersList)
     {
-        TextParameters *textParameters = static_cast<TextParameters*>(parametersList->at(i));
+        TextParameters *textParameters = static_cast<TextParameters*>(parameters);
         QStaticText staticText = textParameters->staticText;
         int textureIndex;
         QOpenGLTexture *texture;
@@ -1608,18 +1607,18 @@ void GLView::paint()
 void GLView::cleanup()
 {
     if (m_modelProgram) {
-        delete m_modelProgram;
-        m_modelProgram = 0;
+        m_modelProgram->deleteLater();
+        m_modelProgram = nullptr;
     }
 
     if (m_lineProgram) {
-        delete m_lineProgram;
-        m_lineProgram = 0;
+        m_lineProgram->deleteLater();
+        m_lineProgram = nullptr;
     }
 
     if (m_textProgram) {
-        delete m_textProgram;
-        m_textProgram = 0;
+        m_textProgram->deleteLater();
+        m_textProgram = nullptr;
     }
 }
 

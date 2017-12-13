@@ -7,13 +7,13 @@
         <source>QML Error:</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Loading QML file failed</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>ApplicationFileDialog</name>
+    <message>
+        <source>Open File</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
         <source>All machinable files (%1)</source>
         <translation type="unfinished"></translation>
@@ -24,10 +24,6 @@
     </message>
     <message>
         <source>All files (*)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open File</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -49,6 +45,14 @@
 <context>
     <name>ApplicationRemoteFileDialog</name>
     <message>
+        <source>Remote Files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Name</source>
         <translation type="unfinished"></translation>
     </message>
@@ -61,7 +65,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Remove file</source>
+        <source>Open directory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -69,7 +73,19 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Remove directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Upload file...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create directory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -90,26 +106,6 @@
     </message>
     <message>
         <source>Close</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Remote Files</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Up</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open directory</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Remove directory</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Create directory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -198,11 +194,11 @@
 <context>
     <name>EditWithSystemEditorAction</name>
     <message>
-        <source>Edit G-Code file with System Editor [%1]</source>
+        <source>&amp;Edit File with System Editor...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&amp;Edit File with System Editor...</source>
+        <source>Edit G-Code file with System Editor [%1]</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -302,6 +298,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Warning!&lt;br&gt;No network connection found, service discovery unavailable. Please check your network connection.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Unicast</source>
         <translation type="unfinished"></translation>
     </message>
@@ -315,10 +315,6 @@
     </message>
     <message>
         <source>IP address or hostname</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Warning!&lt;br&gt;No network connection found, service discovery unavailable. Please check your network connection.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -441,22 +437,30 @@
 <context>
     <name>OpenAction</name>
     <message>
-        <source>Open G-Code file [%1]</source>
+        <source>Open File from Machine...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Open File...</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Open G-Code file stored on machine [%1]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open G-Code file stored on local computer [%1]</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>OptionalStopAction</name>
     <message>
-        <source>Optional stop [%1]</source>
+        <source>Optional Stop (M1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Optional Stop (M1)</source>
+        <source>Optional stop [%1]</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -482,11 +486,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Pause execution [%1]</source>
+        <source>Resume execution [%1]</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Resume execution [%1]</source>
+        <source>Pause execution [%1]</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -504,11 +508,11 @@
 <context>
     <name>ReopenAction</name>
     <message>
-        <source>Reopen current file [%1]</source>
+        <source>Reopen File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Reopen File</source>
+        <source>Reopen current file [%1]</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -649,11 +653,11 @@
 <context>
     <name>TeleopAction</name>
     <message>
-        <source>Enable teleop mode [%1]</source>
+        <source>Teleop Mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Teleop Mode</source>
+        <source>Enable teleop mode [%1]</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -794,6 +798,29 @@
     <message>
         <source>Unhome axis %1 [%2]</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ValueChart</name>
+    <message>
+        <source>Autoscroll enabled</source>
+        <translation type="vanished">Автопрокрутка включена</translation>
+    </message>
+    <message>
+        <source>Autoscroll disabled</source>
+        <translation type="vanished">Автопрокрутка отключена</translation>
+    </message>
+    <message>
+        <source>Timespan: %1%2</source>
+        <translation type="vanished">Отрезок времени: %1%2</translation>
+    </message>
+    <message>
+        <source>Value: &lt;br&gt;&lt;b&gt;%1&lt;/b&gt;</source>
+        <translation type="vanished">Текущее: &lt;br&gt;&lt;b&gt;%1&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>Target: &lt;br&gt;&lt;b&gt;%1&lt;/b&gt;</source>
+        <translation type="vanished">Заданное: &lt;br&gt;&lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
 </context>
 </TS>

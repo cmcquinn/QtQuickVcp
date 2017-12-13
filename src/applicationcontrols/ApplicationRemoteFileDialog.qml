@@ -1,6 +1,6 @@
 import QtQuick 2.2
-import QtQuick.Controls 1.2
-import QtQuick.Layouts 1.1
+import QtQuick.Controls 1.4
+import QtQuick.Layouts 1.3
 import QtQuick.Dialogs 1.2
 import QtQuick.Window 2.0
 import Machinekit.Application 1.0
@@ -14,7 +14,10 @@ Dialog {
     property alias width: content.implicitWidth
     property alias height: content.implicitHeight
 
-    property bool _ready: status.synced && file.ready && (file.transferState === ApplicationFile.NoTransfer)
+    readonly property bool __ready: status.synced && file.ready && (file.transferState === ApplicationFile.NoTransfer)
+
+    id: root
+    title: qsTr("Remote Files")
 
     QtObject {
         id: d
@@ -36,7 +39,7 @@ Dialog {
         function folderUp(folder) {
             var pos = folder.lastIndexOf("/", folder.length-2);
             if (pos > -1) {
-                folder = folder.slice(0, pos+1);
+                folder = folder.slice(0, pos);
             }
             else if (folder !== "") {
                 folder = "";
@@ -50,19 +53,22 @@ Dialog {
                 return;
             }
 
-            if (status.task.taskMode !== ApplicationStatus.TaskModeAuto) {
-                command.setTaskMode('execute', ApplicationCommand.TaskModeAuto);
-            }
-            command.resetProgram('execute');
+
             var dir = tableView.model.getIsDir(row);
             var fileName = tableView.model.getName(row);
             if (dir) {
-                d.currentFolder += fileName + "/";
+                if (currentFolder !== "") {
+                    d.currentFolder += "/" + fileName;
+                }
+                else {
+                    d.currentFolder = fileName;
+                }
+
                 deselectRow();
             }
             else {
                 var newPath = file.remotePath + '/' + file.serverDirectory + '/' + fileName;
-                command.openProgram('execute', newPath);
+                core.executeProgram(newPath);
                 root.close();
             }
         }
@@ -103,10 +109,13 @@ Dialog {
         }
     }
 
-    SystemPalette { id: systemPalette }
+    Binding {
+        target: d
+        property: "currentFolder"
+        value: file.serverDirectory
+    }
 
-    id: root
-    title: qsTr("Remote Files")
+    SystemPalette { id: systemPalette }
 
     contentItem: Rectangle {
         id: content
@@ -134,13 +143,14 @@ Dialog {
             id: tableView
             Layout.fillHeight: true
             Layout.fillWidth: true
-            enabled: _ready
+            enabled: __ready
             model: file.model
 
             TableViewColumn {
                 role: "name"
                 title: qsTr("Name")
                 width: root.width * 0.4
+                delegate: nameEdit
             }
             TableViewColumn {
                 role: "size"
@@ -151,6 +161,21 @@ Dialog {
                 role: "lastModified"
                 title: qsTr("Last Modified")
                 width: root.width * 0.3
+            }
+
+            Component {
+                id: nameEdit
+                Item {
+                    Label {
+                        anchors.fill: parent
+                        anchors.leftMargin: 5
+                        anchors.rightMargin: 5
+                        elide: Text.ElideRight
+                        color: styleData.textColor
+                        text: styleData.value
+                        font.bold: file.model.getIsDir(styleData.row)
+                    }
+                }
             }
 
             onDoubleClicked: d.openFile(row)
@@ -179,25 +204,25 @@ Dialog {
                 id: fileMenu
                 MenuItem {
                     text: d.directorySelected ? qsTr("Open directory") : qsTr("Open file")
-                    enabled: _ready && (tableView.currentRow > -1)
+                    enabled: __ready && (tableView.currentRow > -1)
                     onTriggered: d.openFile(tableView.currentRow)
                 }
 
                 MenuItem {
                     text: d.directorySelected ? qsTr("Remove directory") : qsTr("Remove file")
-                    enabled: _ready && (tableView.currentRow > -1)
+                    enabled: __ready && (tableView.currentRow > -1)
                     onTriggered: d.removeFile(tableView.currentRow)
                 }
 
                 MenuItem {
                     text: qsTr("Upload file...")
-                    enabled: _ready
+                    enabled: __ready
                     onTriggered: d.uploadFileDialog()
                 }
 
                 MenuItem {
                     text: qsTr("Create directory")
-                    enabled: _ready
+                    enabled: __ready
                     onTriggered: directoryNameDialog.open()
                 }
             }
@@ -214,14 +239,14 @@ Dialog {
 
             Button {
                 text: qsTr("Refresh")
-                enabled: _ready
+                enabled: __ready
                 iconName: "view-refresh"
                 onClicked: file.refreshFiles()
             }
 
             Button {
                 text: qsTr("Upload...")
-                enabled: _ready
+                enabled: __ready
                 iconName: "document-open"
                 onClicked: d.uploadFileDialog()
             }
@@ -229,14 +254,14 @@ Dialog {
             Button {
                 text: qsTr("Remove")
                 iconName: "edit-delete"
-                enabled: _ready && (tableView.currentRow > -1)
+                enabled: __ready && (tableView.currentRow > -1)
                 onClicked: d.removeFile(tableView.currentRow)
             }
 
             Button {
                 text: qsTr("Open")
                 iconName: "document-open-remote"
-                enabled: _ready && (tableView.currentRow > -1)
+                enabled: __ready && (tableView.currentRow > -1)
                 onClicked: d.openFile(tableView.currentRow)
             }
 

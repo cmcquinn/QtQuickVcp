@@ -60,6 +60,7 @@ AbstractDigitalReadOut {
             id: root
 
             Label {
+                id: typeLabel
                 width: dummyLabel.font.pixelSize * 2
 
                 color: dummyLabel.color
@@ -68,9 +69,9 @@ AbstractDigitalReadOut {
 
                 Loader {
                     sourceComponent: homedSymbol
-                    anchors.top: parent.top
-                    anchors.bottom: parent.bottom
-                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.top: typeLabel.top
+                    anchors.bottom: typeLabel.bottom
+                    anchors.horizontalCenter: typeLabel.horizontalCenter
                     width: height
                     onLoaded: {
                         item.color = Qt.binding(function(){ return dummyLabel.color; });
@@ -180,7 +181,7 @@ AbstractDigitalReadOut {
                     item.title = Qt.binding(function(){ return (droRect.axisNames[index] + ":"); });
                     item.type = "";
                     item.value = Qt.binding(function(){ return Number(droRect.position[droRect._axisNames[index]]); });
-                    item.homed = Qt.binding(function(){ return ((index < droRect.axisHomed.length) && droRect.axisHomed[index].homed); });
+                    item.homed = Qt.binding(function(){ return ((index < droRect.axisHomed.length) && droRect.axisHomed[droRect._axisIndices[index]].homed); });
                 }
             }
         }

@@ -5,35 +5,23 @@
     <name>HalApplicationWindow</name>
     <message>
         <source>Waiting for services to appear...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ожидание обнаружения сервисов....</translation>
     </message>
     <message>
         <source>Connecting...</source>
-        <translation type="unfinished"></translation>
+        <translation>Соединение...</translation>
     </message>
     <message>
         <source>%1 service</source>
         <comment>Required service</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1 сервис</translation>
     </message>
     <message>
-        <source>Bind rejected error:</source>
-        <translation type="unfinished"></translation>
+        <source>HAL component error:</source>
+        <translation>Ошибка компонента HAL</translation>
     </message>
     <message>
-        <source>Pin change rejected error:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Command error:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Socket error:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No error</source>
+        <source>Back</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

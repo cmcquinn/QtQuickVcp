@@ -5,7 +5,7 @@ import QtQuick.Window 2.0
 
 Item {
     property var launcher: undefined
-    property var applicationLog: {"connected": false}
+    property QtObject applicationLog: QtObject { property bool connected: false }
 
     signal goBack()
 
@@ -45,10 +45,13 @@ Item {
         }
     }
 
-    Connections {
-        target: root.applicationLog
-        ignoreUnknownSignals: true
-        onMessageReceived: d.addLogEntry(message)
+    /*! /internal
+        Cannot directly connect to slots since the file property is var and not a QObject.
+    */
+    onApplicationLogChanged: {
+        if (root.applicationLog.onMessageReceived) {
+            root.applicationLog.onMessageReceived.connect(d.addLogEntry)
+        }
     }
 
     Label {

@@ -29,6 +29,38 @@
 
 namespace qtquickvcp {
 
+/*!
+    \qmltype ApplicationFile
+    \instantiates ApplicationFile
+    \inqmlmodule Machinekit.Application
+    \brief A remote file handler.
+    \ingroup application
+
+    This component interfaces with the Machinekit file service.
+*/
+
+/*! \property string ApplicationFile::localFilePath
+
+    This property holds the path of the local file when loaded.
+*/
+
+/*! \property string ApplicationFile::localPath
+
+    This property holds the path of the local directory for storing files.
+*/
+
+/*! \property string ApplicationFile::remoteFilePath
+
+    This property holds the path of the remote file.
+
+    The local file name is extracted from this property.
+*/
+
+/*! \property string ApplicationFile::remotePath
+
+    This property holds the path of the remote directory for storing files.
+*/
+
 ApplicationFile::ApplicationFile(QObject *parent) :
     QObject(parent),
     m_uri(""),
@@ -44,6 +76,7 @@ ApplicationFile::ApplicationFile(QObject *parent) :
     m_networkReady(false),
     m_model(nullptr),
     m_ready(false),
+    m_showHidden(false),
     m_networkManager(nullptr),
     m_file(nullptr),
     m_ftp(nullptr)
@@ -132,8 +165,8 @@ void ApplicationFile::startDownload()
         return;
     }
 
-    remoteFilePath = m_remoteFilePath.toLocalFile();
-    remotePath = m_remotePath.toLocalFile();
+    remoteFilePath = QDir::cleanPath(m_remoteFilePath.toLocalFile());
+    remotePath = QDir::cleanPath(m_remotePath.toLocalFile());
     fileName = remoteFilePath.mid(remotePath.length() + 1);
 
     int i = fileName.indexOf("/");
@@ -308,7 +341,7 @@ void ApplicationFile::updateError(ApplicationFile::TransferError error, const QS
 QString ApplicationFile::applicationFilePath(const QString &fileName, const QString &serverDirectory) const
 {
     const auto serverPath = QDir(m_localPath.toLocalFile()).filePath(serverDirectory);
-    return QDir(serverPath).filePath(fileName);
+    return QDir(serverPath).absoluteFilePath(fileName);
 }
 
 void ApplicationFile::initializeFtp()
@@ -371,9 +404,11 @@ void ApplicationFile::networkAccessibleChanged(QNetworkAccessManager::NetworkAcc
 
 void ApplicationFile::addToList(const QUrlInfo &urlInfo)
 {
-    ApplicationFileItem *item;
+    if (!m_showHidden && urlInfo.name().startsWith(".")) {
+        return;
+    }
 
-    item = new ApplicationFileItem();
+    auto item = new ApplicationFileItem();
     item->setName(urlInfo.name());
     item->setSize(urlInfo.size());
     item->setOwner(urlInfo.owner());

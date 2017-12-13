@@ -38,7 +38,7 @@ case "$1" in
     shift
     # build QtQuickVcp inside debian x86-64 multiarch image containing arm cross toolchain and libraries
     docker run -i -v "${PWD}:/QtQuickVcp" cmcquinn/qtquickvcp-docker-linux-armhf:latest \
-           /bin/bash -c "/QtQuickVcp/build/Linux/portable/Recipe armhf"
+           /bin/bash -c "cd QtQuickVcp; ./build/Linux/portable/Recipe armhf"
     platform="armhf"
     ;;
 
@@ -54,7 +54,7 @@ case "$1" in
     [ "$1" == "--x86_64" ] && shift || true
     # Build QtQuickVcp AppImage inside native (64-bit x86) Docker image
     docker run -i -v "${PWD}:/QtQuickVcp" machinekoder/qtquickvcp-docker-linux-x64:latest \
-           /bin/bash -c "/QtQuickVcp/build/Linux/portable/Recipe x64"
+           /bin/bash -c "cd QtQuickVcp; ./build/Linux/portable/Recipe x64"
     platform="x64"
     ;;
 esac

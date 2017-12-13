@@ -18,6 +18,7 @@ A remote UI implementation for [Machinekit](https://github.com/machinekit/machin
 * UI components for machine control applications
 * textual GCode preview
 * 3D GCode preview
+* QML live-coding support
 * cross-platform: runs on **Windows**, **Linux**, **Mac OS X**, **Android** and **iOS**
 
 
@@ -71,6 +72,7 @@ wget -O qtquickvcp.${extension} ${url}
 * [QtQuick Module Overview](#module_overview)
 * [Using mkwrapper](#using_mkwrapper)
 * [Using mklauncher](#using_mklauncher)
+* [Using videoserver](#using_videoserver)
 
 **[Building and Installing](#build_and_install)**
 
@@ -110,9 +112,18 @@ Using the generic MachinekitClient is the easiest way to use QtQuickVcp. However
 
 Please add your awesome QtQuickVcp application here!
 
-### Examples
-* [anddemo](https://github.com/qtquickvcp/anddemo)
-* [BasicQtQuickVcp](https://github.com/qtquickvcp/BasicQtQuickVcp)
+### Example UIs
+* [anddemo - Simple HAL Remote Example](https://github.com/qtquickvcp/anddemo)
+* [BasicQtQuickVcp - Custom CNC application example](https://github.com/qtquickvcp/BasicQtQuickVcp)
+
+### Machinekit configurations
+* [mkwrapper-sim - CNC Simulator](https://github.com/qtquickvcp/mkwrapper-sim)
+* [anddemo - Simple HAL Remote example](https://github.com/qtquickvcp/anddemo)
+* [Fabrikator-Mini_CRAMPS - Cartesian 3D printer](https://github.com/machinekit/machinekit/tree/master/configs/ARM/BeagleBone/Fabrikator-Mini-CRAMPS)
+* [MendelMax-CRAMPS - Cartesian 3D printer](https://github.com/machinekit/machinekit/tree/master/configs/ARM/BeagleBone/MendelMax-CRAMPS)
+* [Arcus-3D-C1-BeBoPr - Cable 3D printer](https://github.com/machinekoder/Arcus-3D-C1-BeBoPr)
+* [Rostock-CRAMPS - Delta 3D printer](https://github.com/machinekoder/Rostock-CRAMPS)
+* [TheCoolTool machinekit-configs - CNC and 3D printer](https://github.com/thecooltool/machinekit-configs)
 
 ## Getting Started<a name="getting_started" ></a>
 A good way to get started is to watch the video tutorials on YouTube.
@@ -177,10 +188,12 @@ Linuxcnc needs to know which user-inferface it should use. For mkwrapper you nee
     INTRO_TIME = 0
 
 ##### Modify the HAL-file
-For some user-interface you need a running Haltalk server. You can add one to you existing configuration by adding following in the beginning of the HAL-file:
+For some user-interface you need a running Haltalk server. You can add one to you existing configuration by adding following in the **end of the HAL file**:
 
     # start haltalk server
     loadusr -W haltalk
+
+**Note:** It is important to add the above line to the **end of the HAL file**, not in the beginning or else you will encounter connection problems.
 
 ##### Create a Run-Script
 Machinekit configurations need a few actions to be performed before linuxcnc can start. Take a look at the following script and modify it to fit your configuration. 
@@ -279,6 +292,48 @@ The dot in the end means that mklauncher will recursively search for `launcher.i
 Once you have successfully launched mklauncher you are ready to connect using the *MachinekitClient*.
 
 If you have a embedded Machinekit setup e.g. on the BeagleBone Black, it is recommended to start mklauncher at boot using systemd. Use this guide for reference: [Starting a Machinekit configuration at boot](https://github.com/machinekoder/asciidoc-sandbox/blob/master/Starting-a-Machinekit-configuration-at-boot.md) or use this script [register.py](https://gist.github.com/machinekoder/3eaa42f79f7a19e2244a).
+
+### Using videoserver
+<a name="using_videoserver" ></a>
+QtQuickVcp supports webcam streaming. Webcam streaming uses the `videoserver` as entry point. The `videoserver` requires `mjpeg-streamer` in a special version with ZeroMQ support to be installed on the system.
+
+#### Setup
+To install `mjpeg-streamer` on Debian Stretch use the following commands on you Linux computer:
+```bash
+sudo apt update
+sudo apt install libzmq3-dev protobuf-c-compiler
+```
+Then clone and build `mjpeg-streamer`
+```bash
+git clone https://github.com/machinekoder/mjpeg-streamer
+cd mjpeg-streamer
+make -C mjpg-streamer-experimental
+sudo make -C mjpg-streamer-experimental install
+```
+
+#### Use
+Videoserver requires a `video.ini` file for creating new video streaming instances:
+
+```ini
+[Webcam1]
+framerate: 30
+resolution: "320x240"
+quality: 80
+device: "/dev/video0"
+bufferSize: 1
+```
+
+To start videoserver run:
+```bash
+videoserver -i video.ini Webcam1
+```
+
+To automatically start `videoserver` from you `run.py` you can use following snippet:
+```python
+if os.path.exists('/dev/video0'):  # automatically start videoserver
+    launcher.start_process('videoserver -i video.ini Webcam1')
+```
+
 
 ## Building and installing<a name="build_and_install" ></a>
 QtQuickVcp is very versatile and is available for following platforms:

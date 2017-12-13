@@ -64,6 +64,10 @@ Item {
         ApplicationDescription {
             sourceDir: "./MachinekitClient.ServiceDisplay"
         }
+
+        ApplicationDescription {
+            sourceDir: "./MachinekitClient.LiveCoding"
+        }
     }
 
     Component.onCompleted: {
@@ -94,9 +98,14 @@ Item {
 
     function processOption(option, argument)
     {
-        if (option === '--config')
+        if ((option === '--config') || (option === '-c'))
         {
             connectionWindow.configurationFilePath = argument;
+        }
+        else if (option === '--test-deployment') {
+            if (argument === 'true') {
+                Qt.quit();
+            }
         }
     }
 }
