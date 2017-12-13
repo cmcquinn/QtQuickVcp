@@ -52,7 +52,7 @@ else
 fi
 
 # If not building on Travis then might need to fetch QtQuickVcp
-[ -d "QtQuickVcp" ] || git clone --depth 1 https://github.com/qtquickvcp/QtQuickVcp.git
+[ -d "QtQuickVcp" ] || git clone --depth 1 https://github.com/cmcquinn/QtQuickVcp.git
 
 cd QtQuickVcp
 
