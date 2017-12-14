@@ -42,19 +42,14 @@ fi
 if [ "$1" == "armhf" ]; then
   export QML_IMPORT_PATH="/usr/lib/arm-linux-gnueabihf/qt5/qml"
 else
-  export PATH="${PWD}/qt5/bin:$PATH"
-  export LD_LIBRARY_PATH="${PWD}/qt5/lib:$LD_LIBRARY_PATH"
-  export QT_PLUGIN_PATH="${PWD}/qt5/plugins"
-  export QML_IMPORT_PATH="${PWD}/qt5/qml"
-  export QML2_IMPORT_PATH="${PWD}/qt5/qml"
-  export QT_QPA_PLATFORM_PLUGIN_PATH="${PWD}/qt5/plugins/platforms"
-  export QT_INSTALL_PREFIX="${PWD}/qt5"
+  export PATH="/qt5/bin:$PATH"
+  export LD_LIBRARY_PATH="/qt5/lib:$LD_LIBRARY_PATH"
+  export QT_PLUGIN_PATH="/qt5/plugins"
+  export QML_IMPORT_PATH="/qt5/qml"
+  export QML2_IMPORT_PATH="/qt5/qml"
+  export QT_QPA_PLATFORM_PLUGIN_PATH="/qt5/plugins/platforms"
+  export QT_INSTALL_PREFIX="/qt5"
 fi
-
-# If not building on Travis then might need to fetch QtQuickVcp
-[ -d "QtQuickVcp" ] || git clone --depth 1 https://github.com/cmcquinn/QtQuickVcp.git
-
-cd QtQuickVcp
 
 # deployment.pri needs to be patched on armhf or make install fails
 if [ "$1" == "armhf" ]; then
@@ -66,8 +61,6 @@ fi
 mkdir -p build.release
 cd build.release
 
-# Figure out how many processor cores there are
-export CORES=$(grep -c ^processor /proc/cpuinfo)
 qmake -r ..
 make -j$((`nproc` + 1))
 # make docs
