@@ -32,7 +32,7 @@ which bsdtar || exit 1 # https://github.com/libarchive/libarchive/wiki/ManPageBs
 which grep || exit 1
 
 # Do not upload artefacts generated as part of a pull request
-if [ $(env | grep TRAVIS_PULL_REQUEST ) ] ; then
+if [[ "$(env | grep TRAVIS_PULL_REQUEST )" ]] ; then
   if [ "$TRAVIS_PULL_REQUEST" != "false" ] ; then
     echo "Not uploading AppImage since this is a pull request."
     exit 0
@@ -43,11 +43,11 @@ BINTRAY_USER="${BINTRAY_USER:?Environment variable missing/empty!}" # env
 BINTRAY_API_KEY="${BINTRAY_API_KEY:?Environment variable missing/empty!}" # env
 
 BINTRAY_REPO_OWNER="${BINTRAY_REPO_OWNER:-$BINTRAY_USER}" # env, or use BINTRAY_USER as default
-[ "${BINTRAY_REPO_OWNER}" == "machinekoder" ] && TRUSTED="true" || TRUSTED="false"
+[ "${BINTRAY_REPO_OWNER}" == "cmcquinn" ] && TRUSTED="true" || TRUSTED="false"
 
-WEBSITE_URL="https://github.com/machinekit/QtQuickVcp"
-ISSUE_TRACKER_URL="https://github.com/machinekit/QtQuickVcp/issues"
-GITHUB_REPO="qtquickvcp/QtQuickVcp"
+WEBSITE_URL="https://github.com/cmcquinn/QtQuickVcp"
+ISSUE_TRACKER_URL="https://github.com/cmcquinn/QtQuickVcp/issues"
+GITHUB_REPO="cmcquinn/QtQuickVcp"
 VCS_URL="https://github.com/${GITHUB_REPO}.git" # Mandatory for packages in free Bintray repos
 LICENSE="LGPL-2.1"
 
@@ -227,7 +227,7 @@ fi
 echo ""
 echo "Uploading ${FILE}..."
 ${CURL} -T ${FILE} "${API}/content/${BINTRAY_REPO_OWNER}/${BINTRAY_REPO}/${PCK_NAME}/${VERSION}/${FILE_UPLOAD_PATH}?${url_query}" \
-  || { echo "$0: Error: AppImage upload failed!" >&2 ; exit 1 ;}
+  || { echo "$0: Error: Binary upload failed!" >&2 ; exit 1 ;}
 
 # Update version information *after* AppImage upload (don't want to create an empty version if upload fails)
 echo ""
@@ -271,7 +271,7 @@ fi
 #     data="{
 #     \"list_in_downloads\": true
 #     }"
-# ${CURL} -X PUT -d "${data}" ${API}/file_metadata/${BINTRAY_REPO_OWNER}/${BINTRAY_REPO}/"${FILE_UPLOAD_PATH}"
+# ${CURL} -X PUT -d "${data}" ${API}/file_metadata	/${BINTRAY_REPO_OWNER}/${BINTRAY_REPO}/"${FILE_UPLOAD_PATH}"
 # echo "TODO: Remove earlier versions of the same architecture from the download list"
 
 # echo ""

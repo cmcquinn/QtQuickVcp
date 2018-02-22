@@ -34,13 +34,20 @@ echo "#define REVISION \"${version}\"" > ./src/application/revision.h
 # Build AppImage depending on arch specified in $1 if cross-compiling, else default build x86_64
 case "$1" in
 
-  --armhf )
-    shift
-    # build QtQuickVcp inside debian x86-64 multiarch image containing arm cross toolchain and libraries
-    docker run -i -v "${PWD}:/QtQuickVcp" cmcquinn/qtquickvcp-docker-linux-armhf:latest \
-           /bin/bash -c "cd QtQuickVcp; ./build/Linux/portable/Recipe armhf"
-    platform="armhf"
-    ;;
+  # --armhf )
+  #   shift
+  #   # build QtQuickVcp inside debian x86-64 multiarch image containing arm cross toolchain and libraries
+  #   docker run -i -v "${PWD}:/QtQuickVcp" \
+  #     ericfont/musescore:jessie-crosscompile-armhf \
+  #     /bin/bash -c \
+  #     "/QtQuickVcp/build/Linux+BSD/portable/RecipeDebian --build-only armhf $makefile_overrides"
+  #   # then run inside fully emulated arm image for AppImage packing step (which has trouble inside multiarch image)
+  #   docker run -i --privileged multiarch/qemu-user-static:register
+  #   docker run -i -v "${PWD}:/QtQuickVcp" --privileged \
+  #     ericfont/musescore:jessie-packaging-armhf \
+  #     /bin/bash -c \
+  #     "/QtQuickVcp/build/Linux+BSD/portable/RecipeDebian --package-only armhf"
+  #   ;;
 
   # --i686 )
   #   shift
@@ -54,7 +61,7 @@ case "$1" in
     [ "$1" == "--x86_64" ] && shift || true
     # Build QtQuickVcp AppImage inside native (64-bit x86) Docker image
     docker run -i -v "${PWD}:/QtQuickVcp" machinekoder/qtquickvcp-docker-linux-x64:latest \
-           /bin/bash -c "cd QtQuickVcp; ./build/Linux/portable/Recipe x64"
+           /bin/bash -c "cd QtQuickVcp; ./build/Linux/portable/Recipe"
     platform="x64"
     ;;
 esac
@@ -86,23 +93,16 @@ if [ "${upload}" ]; then
     else
         target="QtQuickVcp_Development"
     fi
-	zipfile=${target}-${version}-Linux-${platform}.tar.gz
-    mv build.release/QtQuickVcp.tar.gz $zipfile
-	# Print the contents of the zipfile to check it's integrity
-	echo "Created zipfile $zipfile:"
-	tar tzf $zipfile
+    mv build.release/QtQuickVcp.tar.gz ${target}-${version}-Linux-${platform}.tar.gz
     ./build/travis/job2_AppImage/bintray_lib.sh ${target}-${version}*.tar.gz
 
-    # AppImage is not currently being build on armhf
-    if [ "$platform" != "armhf" ]; then
-        if [ $release -eq 1 ]; then
-            target="MachinekitClient"
-        else
-            target="MachinekitClient_Development"
-        fi
-        mv build.release/MachinekitClient.AppImage ${target}-${version}-${platform}.AppImage
-        ./build/travis/job2_AppImage/bintray_app.sh ${target}*.AppImage
+    if [ $release -eq 1 ]; then
+        target="MachinekitClient"
+    else
+        target="MachinekitClient_Development"
     fi
+    mv build.release/MachinekitClient.AppImage ${target}-${version}-${platform}.AppImage
+    ./build/travis/job2_AppImage/bintray_app.sh ${target}*.AppImage
 else
   echo "On branch '$branch' so AppImage will not be uploaded." >&2
 fi

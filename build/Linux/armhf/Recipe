@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-# Build a portable AppImage starting from a clean system. Other examples at:
-# https://github.com/probonopd/AppImages/blob/master/recipes/scribus/Recipe
-
 # NOTES:
 #
 # 1) IT IS NOT SAFE TO RUN THIS RECIPE ON A PERSISTENT FILESYSTEM! Use either:
@@ -31,19 +28,21 @@ fi
 ##########################################################################
 # only prepare system if not already prepared (custom docker image)
 if [ ! -f /etc/system-prepared ]; then
-./init.sh
+  ./init.sh
 fi
 
 ##########################################################################
 # BUILD QTQUICKVCP
 ##########################################################################
-export PATH="/qt5/bin:$PATH"
-export LD_LIBRARY_PATH="/qt5/lib:$LD_LIBRARY_PATH"
-export QT_PLUGIN_PATH="/qt5/plugins"
-export QML_IMPORT_PATH="/qt5/qml"
-export QML2_IMPORT_PATH="/qt5/qml"
-export QT_QPA_PLATFORM_PLUGIN_PATH="/qt5/plugins/platforms"
-export QT_INSTALL_PREFIX="/qt5"
+
+# armhf uses qt5 from the Debian repos
+export QML_IMPORT_PATH="/usr/lib/arm-linux-gnueabihf/qt5/qml"
+export QT_INSTALL_PREFIX="/usr/lib"
+
+# FIXME: deployment.pri needs to be patched for armhf or make install fails
+cd src
+patch < deployment-armhf.patch
+cd ..
 
 mkdir -p build.release
 cd build.release
@@ -59,49 +58,12 @@ zipfile="QtQuickVcp.tar.gz"
 mkdir qml
 mkdir lib
 cp -r ${QML_IMPORT_PATH}/Machinekit qml/Machinekit
-cp ${QT_INSTALL_PREFIX}/lib/libmachinetalk* lib/
+cp ${QT_INSTALL_PREFIX}/arm-linux-gnueabihf/libmachinetalk* lib/
 tar -zcf $zipfile qml lib
+
 # allow access to archive from outside the chroot
 chmod a+rwx $zipfile
 chmod a+rwx .
 ls -lh $zipfile
 rm -r qml
 rm -r lib
-
-# create binary zip file
-qt-deploy ../build/deployment-scripts/linux_x64.ini --deploy
-
-# prepare AppDir
-cd MachinekitClient.AppDir
-cp /usr/share/pixmaps/machinekit.png .
-cp /usr/share/applications/machinekit-client.desktop .
-mv machinekit-client AppRun
-cd ..
-
-# prepare variables
-appdir=${PWD}/MachinekitClient.AppDir/
-appimage=${PWD}/MachinekitClient.AppImage
-
-# back to home folder
-cd ../
-
-# cleanup plugins.qmltypes files here, since they have been created with sudo
-sudo chown -R `whoami` ./build.release
-
-##########################################################################
-# PACKAGE INTO APPIMAGE WITH APPIMAGEKIT
-##########################################################################
-
-cd /AppImageKit/AppImageAssistant.AppDir
-./package  "$appdir" "$appimage"
-
-# allow access to AppImage from outside the chroot
-chmod a+rwx "$appimage"
-parent_dir="$(dirname "$appimage")"
-while [ "$(dirname "$parent_dir")" != "$parent_dir" ]; do
-  [ "$parent_dir" == "/" ] && break
-  chmod a+rwx "$parent_dir"
-  parent_dir="$(dirname "$parent_dir")"
-done
-
-ls -lh "$appimage"

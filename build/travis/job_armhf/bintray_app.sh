@@ -60,24 +60,24 @@ FILE="$1"
 # File: <appName>-<version>-<arch>.AppImage
 #
 # QTQUICKVCP NAMING SCHEME:
-# File:    QtQuickVcp-X.Y.Z-<arch>.AppImage (e.g. QtQuickVcp-2.0.3-x64.AppImage)
+# File:    MachinekitClient-X.Y.Z-<arch>.AppImage (e.g. MachinekitClient-2.0.3-x86_64)
 # Version: X.Y.Z
-# Package: QtQuickVcp-Linux-<arch>
+# Package: MachinekitClient-Linux-<arch>
 #
 # NIGHTLY NAMING SCHEME: (For developer builds replace "Nightly" with "Dev")
-# File:    QtQuickVcp-Nightly-<datetime>-<branch>-<commit>-<arch>.AppImage
-#    (e.g. QtQuickVcp-Nightly-201601151332-master-f53w6dg-x64.AppImage)
+# File:    MachinekitClientNightly-<datetime>-<branch>-<commit>-<arch>.AppImage
+#    (e.g. MachinekitClientNightly-201601151332-master-f53w6dg-x86_64.AppImage)
 # Version: <datetime>-<branch>-<commit> (e.g. 201601151332-master-f53w6dg)
-# Package: QtQuickVcp-Nightly-Linux-<branch>-<arch> (e.g. QtQuickVcp-Nightly-master-x64)
+# Package: MachinekitClientNightly-<branch>-<arch> (e.g. MachinekitClientNightly-master-x86_64)
 
 # Read app name from file name (get characters before first dash)
 APPNAME="$(basename "$FILE" | sed -r 's|^([^-]*)-.*$|\1|')"
 
-# Read version from the file name (get characters between first and almost last dash)
-VERSION="$(basename "$FILE" | sed -r 's|^[^-]*-(.*)-[^-]*-[^-]*$|\1|')"
+# Read version from the file name (get characters between first and last dash)
+VERSION="$(basename "$FILE" | sed -r 's|^[^-]*-(.*)-[^-]*$|\1|')"
 
-# Read architecture from file name (characters between last dash and .tar.gz)
-ARCH="$(basename "$FILE" | sed -r 's|^.*-([^-]*)\.tar.gz$|\1|')"
+# Read architecture from file name (characters between last dash and .AppImage)
+ARCH="$(basename "$FILE" | sed -r 's|^.*-([^-]*)\.AppImage$|\1|')"
 
 case "${ARCH}" in
   x86_64|x64|amd64 )
@@ -103,16 +103,16 @@ esac
 
 FILE_UPLOAD_PATH="$(basename "${FILE}")"
 
-if [ "${APPNAME}" == "QtQuickVcp" ]; then
+if [ "${APPNAME}" == "MachinekitClient" ]; then
   # Upload a new version but don't publish it (invisible until published)
   url_query="" # Don't publish, don't overwrite existing files with same name
   PCK_NAME="$APPNAME-Linux-$ARCH"
-  BINTRAY_REPO="${BINTRAY_REPO:-QtQuickVcp}" # env, or use "QtQuickVcp"
+  BINTRAY_REPO="${BINTRAY_REPO:-MachinekitClient}" # env, or use "MachinekitClient"
   LABELS="[\"machinekit\", \"machine control\", \"VCP\", \"AppImage\"]"
   [ "${TRUSTED}" == "true" ] && MATURITY="Official" || MATURITY="Stable"
 else
   # Upload and publish a new development/nightly build (visible to users immediately)
-  url_query="publish=1&override=1" # Automatically publish, overwrite existing
+  url_query="publish=1&override=1" # Automatically publish, overwrite exiting
 
   # Get Git branch from $VERSION (get characters between first and last dash)
   BRANCH="$(echo $VERSION | sed -r 's|^[^-]*-(.*)-[^-]*$|\1|')"
@@ -121,10 +121,10 @@ else
   COMMIT="$(echo $VERSION | sed -r 's|^.*-([^-]*)$|\1|')"
 
   PCK_NAME="$APPNAME-Linux-$BRANCH-$ARCH"
-  BINTRAY_REPO="${BINTRAY_REPO:-QtQuickVcp-Development}" # env, or use "QtQuickVcp-Development"
+  BINTRAY_REPO="${BINTRAY_REPO:-MachinekitClient-Development}" # env, or use "MachinekitClient-Development"
   LABELS="unofficial"
 
-  if [ "${APPNAME}" == "QtQuickVcp-Nightly" ]; then
+  if [ "${APPNAME}" == "MachinekitClientNightly" ]; then
     BINTRAY_REPO="nightlies-linux" # nightlies use a different repo
     LABELS="nightly"
   fi
@@ -152,19 +152,66 @@ echo "* DESKTOP $DESKTOP"
 #  echo "* PCK_NAME $PCK_NAME"
 #fi
 
-if [ "${APPNAME}" == "QtQuickVcp" ]; then
+if [ "${APPNAME}" == "MachinekitClient" ]; then
   # Get description from desktop file (source file: build/Linux+BSD/mscore.desktop.in)
-  DESCRIPTION="QtQuickVcp - Qt Quick Virtual Control Panel for Machinekit"
+  DESCRIPTION="$(bsdtar -f "${FILE}" -O -x ./"${DESKTOP}" | grep -e "^Comment=" | sed s/Comment=//g)!"
 else
   # Use custom description for nightly/development builds
   DESCRIPTION="Automated builds of the $BRANCH development branch. FOR TESTING PURPOSES ONLY!"
 fi
 # Add installation instructions to the description (same for all types of build)
-DESCRIPTION="${APPNAME} modules for $SYSTEM Linux systems.
+DESCRIPTION="${APPNAME} Portable AppImages for $SYSTEM Linux systems.
 
 ${DESCRIPTION}
 
-Extract the contents of the archive to your Qt installation folder to use it"
+Simply download the .AppImage file, give it execute permission, and then run it!
+More instructions at https://musescore.org/handbook/install-linux"
+
+ICONNAME=$(bsdtar -f "${FILE}" -O -x "${DESKTOP}" | grep -e "^Icon=" | sed s/Icon=//g)
+
+# Look for .DirIcon first
+ICONFILE=$(bsdtar -tf "${FILE}" | grep /.DirIcon$ | head -n 1 )
+
+# Look for svg next
+if [ "$ICONFILE" == "" ] ; then
+ ICONFILE=$(bsdtar -tf "${FILE}" | grep ${ICONNAME}.svg$ | head -n 1 )
+fi
+
+# If there is no svg, then look for pngs in usr/share/icons and pick the largest
+if [ "$ICONFILE" == "" ] ; then
+  ICONFILE=$(bsdtar -tf "${FILE}" | grep usr/share/icons.*${ICONNAME}.png$ | sort -V | tail -n 1 )
+fi
+
+# If there is still no icon, then take any png
+if [ "$ICONFILE" == "" ] ; then
+  ICONFILE=$(bsdtar -tf "${FILE}" | grep ${ICONNAME}.png$ | head -n 1 )
+fi
+
+if [ ! "$ICONFILE" == "" ] ; then
+  echo "* ICONFILE $ICONFILE"
+  bsdtar -f "${FILE}" -O -x "${ICONFILE}" > /tmp/_tmp_icon
+  echo "xdg-open /tmp/_tmp_icon"
+fi
+
+# Check if there is appstream data and use it
+APPDATANAME=$(echo ${DESKTOP} | sed 's/.desktop/.appdata.xml/g' | sed 's|./||'  )
+APPDATAFILE=$(bsdtar -tf "${FILE}" | grep ${APPDATANAME}$ | head -n 1 || true)
+APPDATA=$(bsdtar -f "${FILE}" -O -x "${APPDATAFILE}" || true)
+if [ "$APPDATA" == "" ] ; then
+  echo "* APPDATA missing"
+else
+  echo "* APPDATA found"
+  DESCRIPTION=$(echo $APPDATA | grep -o -e "<description.*description>" | sed -e 's/<[^>]*>//g')
+  WEBSITE_URL=$(echo $APPDATA | grep "homepage" | head -n 1 | cut -d ">" -f 2 | cut -d "<" -f 1)
+fi
+
+if [ "$DESCRIPTION" == "" ] ; then
+  bsdtar -f "${FILE}" -O -x ./"${DESKTOP}"
+  echo "DESCRIPTION missing and no Comment= in ${DESKTOP}, exiting"
+  exit 1
+else
+  echo "* DESCRIPTION $DESCRIPTION"
+fi
 
 if [ "$VERSION" == "" ] ; then
   echo "* VERSION missing, exiting"
@@ -241,7 +288,7 @@ echo ""
 echo "Setting attributes for package ${PCK_NAME}..."
 ${CURL} -X POST -d "${ATTRIBUTES}" ${API}/packages/${BINTRAY_REPO_OWNER}/${BINTRAY_REPO}/${PCK_NAME}/versions/${VERSION}/attributes
 
-if [ "${APPNAME}" != "QtQuickVcp" ]; then
+if [ "${APPNAME}" != "MachinekitClient" ]; then
   echo ""
 
   if [ $(env | grep TRAVIS_JOB_ID ) ]; then
