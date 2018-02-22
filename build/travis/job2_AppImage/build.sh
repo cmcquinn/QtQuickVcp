@@ -86,7 +86,11 @@ if [ "${upload}" ]; then
     else
         target="QtQuickVcp_Development"
     fi
-    mv build.release/QtQuickVcp.tar.gz ${target}-${version}-Linux-${platform}.tar.gz
+	zipfile=${target}-${version}-Linux-${platform}.tar.gz
+    mv build.release/QtQuickVcp.tar.gz $zipfile
+	# Print the contents of the zipfile to check it's integrity
+	echo "Created zipfile $zipfile:"
+	tar tzf $zipfile
     ./build/travis/job2_AppImage/bintray_lib.sh ${target}-${version}*.tar.gz
 
     # AppImage is not currently being build on armhf
