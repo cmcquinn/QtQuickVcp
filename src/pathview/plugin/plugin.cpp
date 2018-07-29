@@ -29,6 +29,7 @@
 #include "qglcamera.h"
 #include "glpathitem.h"
 #include "gllight.h"
+#include "gllathetoolitem.h"
 #include "glcanvas.h"
 #include "gcodeprogrammodel.h"
 #include "gcodeprogramloader.h"
@@ -77,6 +78,7 @@ void MachinekitPathViewPlugin::registerTypes(const char *uri)
     qmlRegisterType<qtquickvcp::PreviewClient>(uri, 1, 0, "PreviewClient");
     qmlRegisterType<qtquickvcp::GCodeProgramModel>(uri, 1, 0, "GCodeProgramModel");
     qmlRegisterType<qtquickvcp::GCodeProgramLoader>(uri, 1, 0, "GCodeProgramLoader");
+    qmlRegisterType<qtquickvcp::GLLatheToolItem>(uri, 1, 0, "LatheTool3D");
 
     const QString filesLocation = fileLocation();
     for (int i = 0; i < int(sizeof(qmldir)/sizeof(qmldir[0])); i++) {
@@ -91,10 +93,21 @@ void MachinekitPathViewPlugin::initializeEngine(QQmlEngine *engine, const char *
     if (isLoadedFromResource())
         engine->addImportPath(QStringLiteral("qrc:/"));
 
-    if (m_translator.load(QLocale(), QLatin1String("machinekitpathview"),
-                          QLatin1String("_"), QLibraryInfo::location(QLibraryInfo::TranslationsPath)))
-    {
-        QCoreApplication::installTranslator(&m_translator);
+    // translate the plugin
+    QVector<QString> paths;
+    paths.push_back(QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+    paths.push_back(QCoreApplication::applicationDirPath());
+    paths.push_back(QDir(QCoreApplication::applicationDirPath()).filePath("translations"));
+    paths.push_back(QDir::currentPath());
+    paths.push_back(QDir(QDir::currentPath()).filePath("translations"));
+
+    for (const auto &path: paths) {
+        if (m_translator.load(QLocale(), QLatin1String("machinekitpathview"),
+                              QLatin1String("_"), path))
+        {
+            QCoreApplication::installTranslator(&m_translator);
+            break;
+        }
     }
 }
 

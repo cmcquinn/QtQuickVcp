@@ -38,9 +38,11 @@ class ApplicationStatus : public machinetalk::application::StatusBase
     Q_PROPERTY(QObject* io READ io NOTIFY ioChanged)
     Q_PROPERTY(QObject* task READ task NOTIFY taskChanged)
     Q_PROPERTY(QObject* interp READ interp NOTIFY interpChanged)
+    Q_PROPERTY(QObject* ui READ ui NOTIFY uiChanged)
     Q_PROPERTY(bool running READ isRunning NOTIFY runningChanged)
     Q_PROPERTY(bool synced READ isSynced NOTIFY syncedChanged)
     Q_PROPERTY(StatusChannels channels READ channels WRITE setChannels NOTIFY channelsChanged)
+    Q_PROPERTY(StatusChannels optionalChannels READ optionalChannels WRITE setOptionalChannels NOTIFY optionalChannelsChanged)
     Q_FLAGS(StatusChannels)
 
 public:
@@ -177,7 +179,8 @@ public:
         ConfigChannel = 0x2,
         IoChannel     = 0x4,
         TaskChannel   = 0x8,
-        InterpChannel = 0x10
+        InterpChannel = 0x10,
+        UiChannel     = 0x20
     };
     Q_FLAG(StatusChannel)
     Q_DECLARE_FLAGS(StatusChannels, StatusChannel)
@@ -209,9 +212,18 @@ public:
         return m_interp;
     }
 
+    QObject* ui() const {
+        return m_ui;
+    }
+
     StatusChannels channels() const
     {
         return m_channels;
+    }
+
+    StatusChannels optionalChannels() const
+    {
+        return m_optionalChannels;
     }
 
     bool isRunning() const
@@ -234,16 +246,27 @@ public slots:
         emit channelsChanged(arg);
     }
 
+    void setOptionalChannels(StatusChannels optionalChannels)
+    {
+        if (m_optionalChannels == optionalChannels)
+            return;
+
+        m_optionalChannels = optionalChannels;
+        emit optionalChannelsChanged(m_optionalChannels);
+    }
+
 private:
     QObject     *m_config;
     QObject     *m_motion;
     QObject     *m_io;
     QObject     *m_task;
     QObject     *m_interp;
+    QObject     *m_ui;
     bool            m_running;
     bool            m_synced;
     StatusChannels  m_syncedChannels;
     StatusChannels  m_channels;
+    StatusChannels  m_optionalChannels;
     QHash<QByteArray, StatusChannel> m_channelMap;
 
     void emcstatUpdateReceived(StatusChannel channel, const machinetalk::Container &rx);
@@ -253,6 +276,7 @@ private:
     void updateIoObject(const machinetalk::EmcStatusIo &io);
     void updateTaskObject(const machinetalk::EmcStatusTask &task);
     void updateInterpObject(const machinetalk::EmcStatusInterp &interp);
+    void updateUiObject(const machinetalk::EmcStatusUI &ui);
     void initializeObject(StatusChannel channel);
 
 
@@ -271,7 +295,9 @@ signals:
     void ioChanged();
     void taskChanged();
     void interpChanged();
+    void uiChanged();
     void channelsChanged(StatusChannels arg);
+    void optionalChannelsChanged(StatusChannels optionalChannels);
     void runningChanged(bool arg);
     void syncedChanged(bool arg);
 }; // class ApplicationStatus
